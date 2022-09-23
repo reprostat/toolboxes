@@ -1,4 +1,4 @@
-% aa toolbox interface for Fusion-Watershed (Computational, Cognitive and Clinical Neuroimaging Laboratory, ICL, London, UK)
+% toolbox interface for Fusion-Watershed (Computational, Cognitive and Clinical Neuroimaging Laboratory, ICL, London, UK)
 classdef fwsClass < toolboxClass
     properties (Access = protected)
         hGUI = []% GUI handles

@@ -1,4 +1,3 @@
-% This requires AROMA-ICA to be installed and added as an aa toolbox.
 % Also, AROMA requires python2.7 and pip.
 %
 % The easiest way to install is prolly:
@@ -8,12 +7,6 @@
 %   % python2.7 -m pip install -r ICA-AROMA/requirements.txt
 %
 %   (assuming that the repo link is still valid)
-%
-% add the correspodning entry to your parameterset
-%   <toolbox desc='Toolbox with implemented interface in extrafunctions/toolboxes' ui='custom'>
-%       <name desc='Name corresponding to the name of the interface without the "Class" suffix' ui='text'>aroma</name>
-%           <dir ui='dir'>/users/abcd1234/tools/ICA-AROMA</dir>
-%   </toolbox>
 %
 % TODO: add python virtual environment for shared systems without admin access
 %

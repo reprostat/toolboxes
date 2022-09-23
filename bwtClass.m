@@ -1,4 +1,4 @@
-% aa toolbox interface for BrainWavelet toolbox
+% toolbox interface for BrainWavelet toolbox
 
 classdef bwtClass < toolboxClass
     

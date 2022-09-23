@@ -1,4 +1,4 @@
-% aa class interface for robust weighted least squares toolbox
+% interface for robust weighted least squares toolbox
 %
 % see:
 % Diedrichsen, J., & Shadmehr, R. (2005). Detecting and adjusting for artifacts in fMRI time series data. Neuroimage, 27(3), 624-634
