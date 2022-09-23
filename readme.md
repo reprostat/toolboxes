@@ -1,6 +1,6 @@
 # Toolboxes
 
-The toolbox in _aa_ is a framework for interacting with extrenal tools. They ensure tight integration and transparent control over their operation. The main concept is that an external tool SHOULD be present in only where and when it is needed to avoid ambiguity due to unintended "shadowing" caused by similar or same function names. This is an issue primarily for MATLAB-based tools; therefore, the toolbox framework also primarily concerns these tools.
+The toolbox is a framework for interacting with tools. They ensure tight integration and transparent control over their operation. The main concept is that a tool SHOULD be present in only where and when it is needed to avoid ambiguity due to unintended "shadowing" caused by similar or same function names. This is an issue primarily for MATLAB/Octave-based tools; therefore, the toolbox framework also primarily concerns these tools.
 
 ## Components of the framework
 
@@ -19,28 +19,23 @@ The toolbox name is a unique descriptive identitfier for the tool. It can be any
 - start with a letter
 - be lower cased
   
-This toolbox name connects the several components of the integration:
-- The name of the __interface object__ has a form of `<toolbox name>Class`
-- When `aa_init` initialises the toolbox, it puts the interface instance under `<toolbox name>` into `aacache`
-- In the module, the initialised interface instance can be recalled from the cache as `[~, <interface instance>] = ~aas_cache_get(aap,'<toolbox name>');`
-- The toolbox entry in the __parameterset__ has a field `name` with a value `<toolbox name>`
-- Any modification of the tool (see the Optional extras) sits in the `<aa path>/aa_tools/toolboxes/<toolbox name>_mod` folder
+This toolbox name connects the several components of the integration, e.g., the name of the __interface object__ has a form of `<toolbox name>Class`
 
 ### Interface object
 
-The interface is a MATLAB object derived from the [toolboxClass](https://github.com/automaticanalysis/automaticanalysis/tree/master/aa_tools/toolboxes/toolboxClass.m)
+The interface is an object derived from the [toolboxClass](toolboxClass.m)
 
 The minimum interface MUST 
 - have name of `<toolbox name>Class`
 - be a subclass of `toolboxClass`
 - contain a protected property `hGUI` to store handles to GUI even if the toolbox has none
 - contain an initialisation method parsing the arguments and setting argument defaults
-- contain a `load` method adding the requires folders to the MATLAB path. This `load` methods overrides and calls `toolboxClass.load`.
+- contain a `load` method adding the requires folders to the MATLAB/Octave path. This `load` methods overrides and calls `toolboxClass.load`.
 
-[fwsClass](https://github.com/automaticanalysis/automaticanalysis/tree/master/aa_tools/toolboxes/fwsClass.m)) is a good example for any tool only requires to be added to the MATLAB path:
+[fwsClass](fwsClass.m)) is a good example for any tool only requires to be added to the MATLAB/Octave path:
 
 ```matlab
-% aa toolbox interface for Fusion-Watershed (Computational, Cognitive and Clinical Neuroimaging Laboratory, ICL, London, UK)
+% toolbox interface for Fusion-Watershed (Computational, Cognitive and Clinical Neuroimaging Laboratory, ICL, London, UK)
 classdef fwsClass < toolboxClass % fwsClass is a subclass of toolboxClass 
     properties (Access = protected)
         hGUI = [] % protected compuslory store for GUI handles
@@ -73,50 +68,17 @@ classdef fwsClass < toolboxClass % fwsClass is a subclass of toolboxClass
 end
 ```
 
-### Module
+### Usage
 
-The corresponding module manages the tool via the interface. The minimum management includes (example from `aamod_tdt_decode`)
-- checking the presence of the toolbox during workflow initialisation (`aa_init`)
-```matlab
-    case 'checkrequirements'
-        if ~aas_cache_get(aap,'tdt'), aas_log(aap,true,'TDT is not found'); end
-```
-
-- loading the the toolbox at the beginning of execution (`'doit'`)
-```matlab
-        [~, TDT] = ~aas_cache_get(aap,'tdt');
+Tool can be managed via the interface. The minimum management includes
+- loading the the toolbox before any related operation
+```matlab        
         TDT.load;
 ```
 
-- unloading the toolbox at the end of the execution (`'doit'`)
+- unloading the toolbox after any related operation
 ```matlab
         TDT.unload;
-```
-
-### Parameterset
-
-The site-specific parameterset contains a corresponding toolbox entry for the tool. The mimumum entry includes toolbox name and path. Multiple entries can be added right after each other. The order does not matter.
-
-For example ([aap_parameters_defaults_UoS](https://github.com/automaticanalysis/automaticanalysis/tree/master/aa_parametersets/aap_parameters_defaults_UoS.xml)):
-
-```xml
-        <directory_conventions>
-            <toolbox desc='Toolbox with implemented interface in extrafunctions/toolboxes' ui='custom'>
-                <name desc='Name corresponding to the name of the interface without the "Class" suffix' ui='text'>tdt</name>
-                <dir ui='dir'>/users/psychology01/software/decoding_toolbox</dir>
-            </toolbox>
-            <toolbox desc='Toolbox with implemented interface in extrafunctions/toolboxes' ui='custom'>
-                <name desc='Name corresponding to the name of the interface without the "Class" suffix' ui='text'>fws</name>
-                <dir ui='dir'>/users/psychology01/software/matlab-fws</dir>
-            </toolbox>
-            <toolbox desc='Toolbox with implemented interface in extrafunctions/toolboxes' ui='custom'>
-                <name desc='Name corresponding to the name of the interface without the "Class" suffix' ui='text'>bnv</name>
-                <dir ui='dir'>/users/psychology01/software/BrainNetViewer</dir>
-            </toolbox>
-            <toolbox desc='Toolbox with implemented interface in extrafunctions/toolboxes' ui='custom'>
-                <name desc='Name corresponding to the name of the interface without the "Class" suffix' ui='text'>conn</name>
-                <dir ui='dir'>/users/psychology01/software/CONN</dir>
-            </toolbox>
 ```
 
 ## Optional extras
