@@ -32,7 +32,9 @@ The minimum interface MUST
 - contain an initialisation method parsing the arguments and setting argument defaults
 - contain a `load` method adding the requires folders to the MATLAB/Octave path. This `load` methods overrides and calls `toolboxClass.load`.
 
-[fwsClass](fwsClass.m)) is a good example for any tool only requires to be added to the MATLAB/Octave path:
+[fwsClass](fwsClass.m) is a good example for any tool only requires to be added to the MATLAB/Octave path 
+
+(CAVE: This is a demonstration of the `toolbox` interface only and does not imply anything on the compatibility of Fusion-Watershed with MATLAB and Octave):
 
 ```matlab
 % toolbox interface for Fusion-Watershed (Computational, Cognitive and Clinical Neuroimaging Laboratory, ICL, London, UK)
