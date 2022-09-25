@@ -2,23 +2,23 @@ classdef spmClass < toolboxClass
     properties (Access = protected)
         hGUI = []% GUI handles
     end
-    
+
     methods
-        function obj = spmClass(path,varargin)
+        function this = spmClass(path,varargin)
             defaultAddToPath = false;
-            
+
             argParse = inputParser;
             argParse.addRequired('path',@ischar);
             argParse.addParameter('name','',@ischar);
             argParse.addParameter('doAddToPath',defaultAddToPath,@(x) islogical(x) || isnumeric(x));
             argParse.parse(path,varargin{:});
-            
-            obj = obj@toolboxClass(argParse.Results.name,argParse.Results.path,argParse.Results.doAddToPath,{});
-            
-            obj.addToolbox(fieldtripClass(fullfile(obj.toolPath,'external','fieldtrip'),'name','fieldtrip'));
-            
-            obj.collections(1).name = 'meeg';
-            obj.collections(1).path = {...
+
+            this = this@toolboxClass(argParse.Results.name,argParse.Results.path,argParse.Results.doAddToPath,{});
+
+            this.addToolbox(fieldtripClass(fullfile(this.toolPath,'external','fieldtrip'),'name','fieldtrip'));
+
+            this.collections(1).name = 'meeg';
+            this.collections(1).path = {...
                     'external/bemcp'...
                     'external/ctf'...
                     'external/eeprobe'...
@@ -29,14 +29,16 @@ classdef spmClass < toolboxClass
                     'toolbox/Neural_Models'...
                     'toolbox/MEEGtools'...
                     };
-            obj.collections(1).toolbox = {'fieldtrip'};
+            this.collections(1).toolbox = {'fieldtrip'};
         end
-        
-        function load(obj)
-            addpath(obj.toolPath);
+
+        function load(this)
+            addpath(this.toolPath);
             spm_jobman('initcfg');
-            
-            load@toolboxClass(obj)
+            [~, r] = spm('Ver');
+            this.version = spm('FnBanner', ['v' r]);
+
+            load@toolboxClass(this)
         end
     end
 end
