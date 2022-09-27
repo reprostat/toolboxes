@@ -12,13 +12,14 @@ classdef toolboxClass < handle
         status
     end
 
+    properties (Access = protected, Constant = true)
+        STATUS = containers.Map(...
+            {'undefined' 'defined' 'unloaded' 'loaded'},...
+            [-1 0 1 2] ...
+            );
+    end
+
     properties (Access = protected)
-        CONST_STATUS = struct(...
-            'undefined', -1,...
-            'defined', 0,...
-            'unloaded', 1,...
-            'loaded', 2 ...
-        )
         pStatus = -1
 
         toolInPath = {}
@@ -43,24 +44,19 @@ classdef toolboxClass < handle
                 this.toolInPath = cellstr(this.toolPath);
                 this.setAutoLoad();
             end
-            this.pStatus = this.CONST_STATUS.defined;
+            this.pStatus = this.STATUS('defined');
 
             this.workspace = cellfun(@jsondecode, workspaceVariableNames);
             if ~isempty(this.workspace), this.workspace(1).value = []; end
         end
 
         function val = get.status(this)
-            for f = fieldnames(this.CONST_STATUS)'
-                if this.CONST_STATUS.(f{1}) == this.pStatus
-                    val = f{1};
-                    break;
-                end
-            end
+            val = this.STATUS.keys(cell2mat(this.STATUS.values) == this.pStatus);
         end
 
         function load(this,keepWorkspace)
             if nargin < 2, keepWorkspace = false; end
-            if this.pStatus < this.CONST_STATUS.loaded
+            if this.pStatus < this.STATUS('loaded')
                 p = strsplit(path,pathsep);
                 this.toolInPath = p(cellfun(@(x) ~isempty(strfind(x,this.toolPath)), p));
 
@@ -73,7 +69,7 @@ classdef toolboxClass < handle
                     modDir = strsplit(genpath(modDir),pathsep);
                     this.toolInPath = [modDir(1:end-1)'; this.toolInPath];
                 end
-                this.pStatus = this.CONST_STATUS.loaded;
+                this.pStatus = this.STATUS('loaded');
             end
             toRemove = [];
             for iw = 1:numel(this.workspace)
@@ -109,7 +105,7 @@ classdef toolboxClass < handle
                 end
             end
 
-            this.pStatus = this.CONST_STATUS.undefined;
+            this.pStatus = this.STATUS('undefined');
         end
 
         function reload(this,loadWorkspace)
@@ -117,9 +113,9 @@ classdef toolboxClass < handle
             if nargin < 2, loadWorkspace = false; end
 
             % re-add to path
-            if this.pStatus < this.CONST_STATUS.loaded
-                addpath(sprintf(['%s' pathsep],this.toolInPath{:}))
-                this.pStatus = this.CONST_STATUS.loaded;
+            if this.pStatus < this.STATUS('loaded')
+                addpath(strjoin(this.toolInPath,pathsep))
+                this.pStatus = this.STATUS('loaded');
             end
 
             % reload sub-toolboxes
@@ -144,10 +140,15 @@ classdef toolboxClass < handle
             if nargin < 2, updateWorkspace = false; end
 
             % remove from path
-            if this.pStatus > this.CONST_STATUS.unloaded
+            if this.pStatus > this.STATUS('unloaded')
                 warning('%s''s folders (and subfolders) will be removed from the MATLAB path',class(this));
-                rmpath(sprintf(['%s' pathsep],this.toolInPath{:}))
-                this.pStatus = this.CONST_STATUS.unloaded;
+                if any(strcmp(this.toolInPath,pwd)) % current path in toolInPath -> cd Octave (assume no tool in Octave)
+                    cwd = pwd;
+                    cd(OCTAVE_HOME);
+                end
+                rmpath(strjoin(this.toolInPath,pathsep))
+                if exist('cwd','var'), cd(cwd); end
+                this.pStatus = this.STATUS('unloaded');
             end
 
             % unload sub-toolboxes
@@ -215,7 +216,7 @@ classdef toolboxClass < handle
 
         %% collections
          function addCollection(this,collection)
-            if this.pStatus < this.CONST_STATUS.loaded
+            if this.pStatus < this.STATUS('loaded')
                 warning('toolbox is not loaded')
                 return
             end
