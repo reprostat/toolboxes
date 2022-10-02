@@ -51,7 +51,7 @@ classdef toolboxClass < handle
         end
 
         function val = get.status(this)
-            val = this.STATUS.keys(cell2mat(this.STATUS.values) == this.pStatus);
+            val = this.STATUS.keys{cell2mat(this.STATUS.values) == this.pStatus};
         end
 
         function load(this,keepWorkspace)
@@ -189,7 +189,7 @@ classdef toolboxClass < handle
             end
 
             isTb = cellfun(@(t) strcmp(tbname,t.name), this.toolboxes);
-            if ~isTb
+            if isempty(isTb) || ~isTb
                 warning('toolbox %s is not a sub-toolbox', tbname);
             else
                 this.toolboxes{isTb}.(task);
