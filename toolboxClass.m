@@ -1,4 +1,4 @@
-classdef toolboxClass < handle
+classdef toolboxClass < statusClass
     properties
         name = ''
         version
@@ -8,20 +8,7 @@ classdef toolboxClass < handle
         showGUI = false % show GUI upon load
     end
 
-    properties (Dependent)
-        status
-    end
-
-    properties (Access = protected, Constant = true)
-        STATUS = containers.Map(...
-            {'undefined' 'defined' 'unloaded' 'loaded'},...
-            [-1 0 1 2] ...
-            );
-    end
-
     properties (Access = protected)
-        pStatus = -1
-
         toolInPath = {}
 
         workspace
@@ -48,10 +35,6 @@ classdef toolboxClass < handle
 
             this.workspace = cellfun(@jsondecode, workspaceVariableNames);
             if ~isempty(this.workspace), this.workspace(1).value = []; end
-        end
-
-        function val = get.status(this)
-            val = this.STATUS.keys{cell2mat(this.STATUS.values) == this.pStatus};
         end
 
         function load(this,keepWorkspace)
