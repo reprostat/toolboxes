@@ -10,6 +10,7 @@ classdef toolboxClass < statusClass
 
     properties (Access = protected)
         toolInPath = {}
+        toolClassPath
 
         workspace
 
@@ -25,7 +26,10 @@ classdef toolboxClass < statusClass
     methods
         function this = toolboxClass(name,path,doAddToPath,workspaceVariableNames)
             this.name = name;
-            this.toolPath = path;
+            this.toolPath = strrep(path,'/',filesep);
+
+            this.toolClassPath = fileparts(which([class(this) '.m']));
+
             if doAddToPath
                 addpath(this.toolPath);
                 this.toolInPath = cellstr(this.toolPath);
@@ -50,7 +54,7 @@ classdef toolboxClass < statusClass
                 if exist(modDir,'dir')
                     addpath(genpath(modDir));
                     modDir = strsplit(genpath(modDir),pathsep);
-                    this.toolInPath = [modDir(1:end-1)'; this.toolInPath];
+                    this.toolInPath = [reshape(modDir(1:end-1),[],1); reshape(this.toolInPath,[],1)];
                 end
                 this.pStatus = this.STATUS('loaded');
             end
@@ -71,13 +75,13 @@ classdef toolboxClass < statusClass
         end
 
         function close(this)
-            % remove from path
-            if ~this.keepInPath, this.unload; end
-
             % close sub-toolboxes
             for t = this.toolboxes
                 t{1}.close;
             end
+
+            % remove from path
+            if ~this.keepInPath, this.unload; end
 
             % GUI and workspace
             for h = this.hGUI, close(h); end
@@ -122,21 +126,23 @@ classdef toolboxClass < statusClass
             % default
             if nargin < 2, updateWorkspace = false; end
 
+            % unload sub-toolboxes
+            for t = this.toolboxes
+                t{1}.unload;
+            end
+
             % remove from path
             if this.pStatus > this.STATUS('unloaded')
                 warning('%s''s folders (and subfolders) will be removed from the MATLAB path',class(this));
                 if any(strcmp(this.toolInPath,pwd)) % current path in toolInPath -> cd Octave (assume no tool in Octave)
                     cwd = pwd;
-                    cd(OCTAVE_HOME);
+                    if isOctave(), cd(OCTAVE_HOME);
+                    else, cd(matlabroot);
+                    end
                 end
                 rmpath(strjoin(this.toolInPath,pathsep))
                 if exist('cwd','var'), cd(cwd); end
                 this.pStatus = this.STATUS('unloaded');
-            end
-
-            % unload sub-toolboxes
-            for t = this.toolboxes
-                t{1}.unload;
             end
 
             % GUI and workspace
@@ -147,6 +153,13 @@ classdef toolboxClass < statusClass
                 if isfield(this.workspace(iw),'attributes') && any(strcmp(this.workspace(iw).attributes,'global'))
                     eval(['clear global ' this.workspace(iw).name]);
                 end
+            end
+
+            % make sure this class stays in path if not closed
+            st = dbstack;
+            if ~any(strcmp({st.name},'toolboxClass.close'))
+                if ~exist(which([class(this) '.m']),'file'), addpath(this.toolClassPath); end
+                if ~exist('toolboxClass.m','file'), addpath(fileparts(mfilename('fullpath'))); end
             end
         end
 
