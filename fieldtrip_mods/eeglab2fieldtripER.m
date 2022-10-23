@@ -127,7 +127,7 @@ if cfg.reorient
     else
         chind(chind==0) = [];
         EXP_VO = [1 3 2]; % expected order variance -> this should be 1 3 2
-        [junk,so] = sort(std(data.elec.elecpos(chind,:))); %
+        [~,so] = sort(std(data.elec.elecpos(chind,:))); %
         data.elec.elecpos(:,1:3) = data.elec.elecpos(:,so(EXP_VO));
         data.elec.chanpos(:,1:3) = data.elec.chanpos(:,so(EXP_VO));
     end
