@@ -13,7 +13,11 @@ classdef spmClass < toolboxClass
             argParse.addParameter('doAddToPath',defaultAddToPath,@(x) islogical(x) || isnumeric(x));
             argParse.parse(path,varargin{:});
 
-            this = this@toolboxClass(argParse.Results.name,argParse.Results.path,argParse.Results.doAddToPath,{});
+            vars = {...
+                '{"name": "defaults", "attributes": ["global"]}'...
+                };
+
+            this = this@toolboxClass(argParse.Results.name,argParse.Results.path,argParse.Results.doAddToPath,vars);
 
             this.addToolbox(fieldtripClass(fullfile(this.toolPath,'external','fieldtrip'),'name','fieldtrip'));
 
