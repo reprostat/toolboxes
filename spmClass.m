@@ -37,12 +37,20 @@ classdef spmClass < toolboxClass
         end
 
         function load(this)
-            addpath(this.toolPath);
-            spm_jobman('initcfg');
-            [~, r] = spm('Ver');
-            this.version = spm('FnBanner', ['v' r]);
+            if this.pStatus < this.STATUS('loaded')
+                addpath(this.toolPath);
+                spm_jobman('initcfg');
+                [~, r] = spm('Ver');
+                this.version = spm('FnBanner', ['v' r]);
+            end
+            load@toolboxClass(this);
+        end
 
-            load@toolboxClass(this)
+        function unload(this,varargin)
+            global defaults
+            assignin('base', 'defaults', defaults);
+
+            unload@toolboxClass(this,varargin{:});
         end
     end
 end

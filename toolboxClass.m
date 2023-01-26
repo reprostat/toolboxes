@@ -148,7 +148,7 @@ classdef toolboxClass < statusClass
             % GUI and workspace
             if this.showGUI, for h = this.hGUI, set(h,'visible','off'); end; end
             for iw = 1:numel(this.workspace)
-                if updateWorkspace, this.workspace.(iw).value = evalin('base',this.workspace(iw).name); end
+                if updateWorkspace, this.workspace(iw).value = evalin('base',this.workspace(iw).name); end
                 evalin('base',['clear ' this.workspace(iw).name]);
                 if isfield(this.workspace(iw),'attributes') && any(strcmp(this.workspace(iw).attributes,'global'))
                     eval(['clear global ' this.workspace(iw).name]);
