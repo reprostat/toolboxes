@@ -19,6 +19,13 @@ classdef toolboxClass < statusClass
         toolboxes = cell(1,0)
     end
 
+    properties (Access = protected, Constant = true)
+        STATUS = containers.Map(...
+            {'undefined' 'defined' 'unloaded' 'loaded'},...
+            [-1 0 1 2] ...
+            );
+    end
+
     properties (Access = protected, Abstract)
         hGUI % GUI handles
     end

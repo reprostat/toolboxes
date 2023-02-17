@@ -3,11 +3,8 @@ classdef statusClass < handle
         status
     end
 
-    properties (Access = protected, Constant = true)
-        STATUS = containers.Map(...
-            {'undefined' 'defined' 'unloaded' 'loaded'},...
-            [-1 0 1 2] ...
-            );
+    properties (Abstract, Access = protected, Constant = true)
+        STATUS
     end
 
     properties (Access = protected)
@@ -16,7 +13,8 @@ classdef statusClass < handle
 
     methods
         function resp = get.status(this)
-            resp = this.STATUS.keys{cell2mat(this.STATUS.values) == this.pStatus};
+            keys = this.STATUS.keys;
+            resp = keys{cell2mat(this.STATUS.values) == this.pStatus};
         end
     end
 end
