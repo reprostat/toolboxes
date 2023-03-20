@@ -8,7 +8,7 @@ classdef toolboxClass < statusClass
         showGUI = false % show GUI upon load
     end
 
-    properties (Access = protected)
+    properties (SetAccess = protected)
         toolInPath = {}
         toolClassPath
 
