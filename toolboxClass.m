@@ -8,7 +8,7 @@ classdef toolboxClass < statusClass
         showGUI = false % show GUI upon load
     end
 
-    properties (SetAccess = protected)
+    properties (Hidden, SetAccess = protected)
         toolInPath = {}
         toolClassPath
 
@@ -46,6 +46,15 @@ classdef toolboxClass < statusClass
 
             this.workspace = cellfun(@jsondecode, workspaceVariableNames);
             if ~isempty(this.workspace), this.workspace(1).value = []; end
+        end
+
+        function val = struct(this)
+            val = struct('className',class(this),...
+                         'name',this.name,...
+                         'path',this.toolPath,...
+                         'doAddToPath',this.autoLoad,...
+                         'status',this.status);
+            val.toolInPath = this.toolInPath;
         end
 
         function load(this,keepWorkspace)
@@ -95,7 +104,7 @@ classdef toolboxClass < statusClass
             for iw = 1:numel(this.workspace)
                 evalin('base',['clear ' this.workspace(iw).name]);
                 if isfield(this.workspace(iw),'attributes') && any(strcmp(this.workspace(iw).attributes,'global'))
-                    eval(['clear global ' this.workspace(iw).name]);
+                    evalin('base',['clear global ' this.workspace(iw).name]);
                 end
             end
 
@@ -122,7 +131,7 @@ classdef toolboxClass < statusClass
             if loadWorkspace
                 for iw = 1:numel(this.workspace)
                     if isfield(this.workspace(iw),'attributes') && any(strcmp(this.workspace(iw).attributes,'global'))
-                        eval(['global ' this.workspace(iw).name]);
+                        evalin('base',['global ' this.workspace(iw).name]);
                     end
                     assignin('base', this.workspace(iw).name, this.workspace(iw).value);
                 end
@@ -158,7 +167,7 @@ classdef toolboxClass < statusClass
                 if updateWorkspace, this.workspace(iw).value = evalin('base',this.workspace(iw).name); end
                 evalin('base',['clear ' this.workspace(iw).name]);
                 if isfield(this.workspace(iw),'attributes') && any(strcmp(this.workspace(iw).attributes,'global'))
-                    eval(['clear global ' this.workspace(iw).name]);
+                    evalin('base',['clear global ' this.workspace(iw).name]);
                 end
             end
 

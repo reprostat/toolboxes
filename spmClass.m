@@ -8,16 +8,23 @@ classdef spmClass < toolboxClass
             defaultAddToPath = false;
 
             argParse = inputParser;
-            argParse.addRequired('path',@ischar);
+            argParse.addRequired('path',@(x) ischar(x) || isstruct(x));
             argParse.addParameter('name','',@ischar);
             argParse.addParameter('doAddToPath',defaultAddToPath,@(x) islogical(x) || isnumeric(x));
             argParse.parse(path,varargin{:});
+
+
+            if ischar(path)
+                initStruct = argParse.Results;
+            else % load from struct
+                initStruct = path;
+            end
 
             vars = {...
                 '{"name": "defaults", "attributes": ["global"]}'...
                 };
 
-            this = this@toolboxClass(argParse.Results.name,argParse.Results.path,argParse.Results.doAddToPath,vars);
+            this = this@toolboxClass(initStruct.name,initStruct.path,initStruct.doAddToPath,vars);
 
             this.addToolbox(fieldtripClass(fullfile(this.toolPath,'external','fieldtrip'),'name','fieldtrip'));
 
@@ -34,6 +41,20 @@ classdef spmClass < toolboxClass
                     'toolbox/MEEGtools'...
                     };
             this.collections(1).toolbox = {'fieldtrip'};
+
+            if isfield(initStruct,'workspace') % load from struct
+                this.toolInPath = initStruct.toolInPath;
+                this.workspace = initStruct.workspace;
+                if strcmp(initStruct.status,'loaded') && (this.pStatus < this.STATUS('loaded'))
+                    this.reload(true);
+                end
+            end
+
+        end
+
+        function val = struct(this)
+            val = struct@toolboxClass(this);
+            val.workspace = this.workspace;
         end
 
         function load(this)
@@ -54,3 +75,21 @@ classdef spmClass < toolboxClass
         end
     end
 end
+
+%!test
+%! SPM = spmClass('D:\Programs\spm12','doAddToPath',true);
+%! SPM.load();
+%! global defaults
+%! defaults.extra = 'terefere';
+%! SPM.unload(true);
+%! SPM.reload(true);
+%! assert(defaults.extra, 'terefere')
+%! sSPM = struct(SPM);
+%! save -mat sSPM.mat sSPM
+%! clear sSPM
+%! SPM.close();
+%! load sSPM.mat sSPM
+%! delete sSPM.mat
+%! constr = str2func(sSPM.className);
+%! SPM = constr(sSPM);
+%! assert(defaults.extra, 'terefere')
