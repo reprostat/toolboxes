@@ -81,7 +81,7 @@ classdef eeglabClass < toolboxClass
 
             % postprocess 
             for p = reshape(plPost,1,[])
-                aas_log([],false,['INFO: post-process installtion of ' p{1}]);
+                fprintf('info:post-process installtion of %s\n', p{1});
                 obj.(['postprocess_' p{1}])();
             end
             

@@ -58,7 +58,7 @@ classdef fieldtripClass < toolboxClass
                 ft_default.trackcallinfo = 'no';
                 ft_default.showcallinfo = 'no';
                 if ~isempty(spmVer), ft_default.spmversion = lower(spmVer); end
-                fprintf('INFO: SPM version %s is set\n',spmVer);
+                fprintf('info:SPM version %s is set\n',spmVer);
             end
         end
         
