@@ -16,7 +16,7 @@ CONFIGFILE=$4
 function fslconfig_bash {
     echo 'export FSLDIR=INSTDIR/fsl'
     echo 'export PATH=$FSLDIR/bin:$PATH'
-    echo 'source $FSLDIR/etc/fslconf/fsl.sh'
+    echo '. $FSLDIR/etc/fslconf/fsl.sh'
 }
 
 cd ${INSTDIR}
