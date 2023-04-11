@@ -185,8 +185,7 @@ classdef toolboxClass < statusClass
                 warning('sub-toolbox MUST have a name');
                 return
             end
-            isTb = cellfun(@(t) strcmp(tb.name,t.name), this.toolboxes);
-            if isTb
+            if this.hasToolbox(tb.name)
                 warning('toolbox %s is already added as a sub-toolbox', tb.name);
             else
                 if tb.autoLoad, tb.load; end
@@ -200,16 +199,21 @@ classdef toolboxClass < statusClass
                 return
             end
 
-            isTb = cellfun(@(t) strcmp(tbname,t.name), this.toolboxes);
-            if isempty(isTb) || ~isTb
+            isTb = this.hasToolbox(tbname);
+            if ~isTb
                 warning('toolbox %s is not a sub-toolbox', tbname);
             else
                 this.toolboxes{isTb}.(task);
             end
         end
 
+        function resp = hasToolbox(this,tbname)
+            resp = find(cellfun(@(t) strcmp(tbname,t.name), this.toolboxes));
+            if isempty(resp), resp = 0; end
+        end
+
         function rmToolbox(this,tbname)
-            isTb = cellfun(@(t) strcmp(tbname,t.name), this.toolboxes);
+            isTb = isTb = this.hasToolbox(tbname);
             if ~isTb
                 warning('toolbox %s is not a sub-toolbox', tbname);
             else
