@@ -213,7 +213,7 @@ classdef toolboxClass < statusClass
         end
 
         function rmToolbox(this,tbname)
-            isTb = isTb = this.hasToolbox(tbname);
+            isTb = this.hasToolbox(tbname);
             if ~isTb
                 warning('toolbox %s is not a sub-toolbox', tbname);
             else
