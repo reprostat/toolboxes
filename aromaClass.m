@@ -14,22 +14,29 @@ classdef aromaClass < toolboxClass
     properties (Access = protected)
         hGUI = []% GUI handles
     end
-    
+
+    properties (SetAccess = private)
+        condaEnvironment
+    end
+
     methods
-        function obj = aromaClass(path,varargin)
+        function this = aromaClass(path,varargin)
             defaultAddToPath = false;
-            
+
             argParse = inputParser;
             argParse.addRequired('path',@ischar);
             argParse.addParameter('name','',@ischar);
             argParse.addParameter('doAddToPath',defaultAddToPath,@(x) islogical(x) || isnumeric(x));
+            argParse.addParameter('condaEnvironment','',@ischar);
             argParse.parse(path,varargin{:});
-            
-            obj = obj@toolboxClass(argParse.Results.name,argParse.Results.path,argParse.Results.doAddToPath,{});
+
+            this = this@toolboxClass(argParse.Results.name,argParse.Results.path,argParse.Results.doAddToPath,{});
+
+            this.condaEnvironment = argParse.Results.condaEnvironment;
         end
-        
-        function load(obj)
-            load@toolboxClass(obj)
+
+        function load(this)
+            load@toolboxClass(this)
 
         end
     end
