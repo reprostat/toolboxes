@@ -13,18 +13,11 @@ classdef spmClass < toolboxClass
             argParse.addParameter('doAddToPath',defaultAddToPath,@(x) islogical(x) || isnumeric(x));
             argParse.parse(path,varargin{:});
 
-
-            if ischar(path)
-                initStruct = argParse.Results;
-            else % load from struct
-                initStruct = path;
-            end
-
             vars = {...
                 '{"name": "defaults", "attributes": ["global"]}'...
                 };
 
-            this = this@toolboxClass(initStruct.name,initStruct.path,initStruct.doAddToPath,vars);
+            this = this@toolboxClass(argParse.Results.name,argParse.Results.path,argParse.Results.doAddToPath,vars);
 
             this.addToolbox(fieldtripClass(fullfile(this.toolPath,'external','fieldtrip'),'name','fieldtrip'));
 
@@ -42,19 +35,7 @@ classdef spmClass < toolboxClass
                     };
             this.collections(1).toolbox = {'fieldtrip'};
 
-            if isfield(initStruct,'workspace') % load from struct
-                this.toolInPath = initStruct.toolInPath;
-                this.workspace = initStruct.workspace;
-                if strcmp(initStruct.status,'loaded') && (this.pStatus < this.STATUS('loaded'))
-                    this.reload(true);
-                end
-            end
-
-        end
-
-        function val = struct(this)
-            val = struct@toolboxClass(this);
-            val.workspace = this.workspace;
+            this.updateAfterLoadedFromStruct();
         end
 
         function load(this)
@@ -77,7 +58,7 @@ classdef spmClass < toolboxClass
 end
 
 %!test
-%! SPM = spmClass('D:\Programs\spm12','doAddToPath',true);
+%! SPM = spmClass('/home/akk/tools/spm12','doAddToPath',true);
 %! SPM.load();
 %! global defaults
 %! defaults.extra = 'terefere';
@@ -93,3 +74,4 @@ end
 %! constr = str2func(sSPM.className);
 %! SPM = constr(sSPM);
 %! assert(defaults.extra, 'terefere')
+%! SPM.close();

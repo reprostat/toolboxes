@@ -17,6 +17,8 @@ classdef toolboxClass < statusClass
         collections = struct('name',{},'path',{},'toolbox',{})
 
         toolboxes = cell(1,0)
+
+        loadedFromStruct = false
     end
 
     properties (Access = protected, Constant = true)
@@ -32,6 +34,14 @@ classdef toolboxClass < statusClass
 
     methods
         function this = toolboxClass(name,path,doAddToPath,workspaceVariableNames)
+            if isstruct(path) % load from struct
+                this.loadedFromStruct = path;
+
+                name = this.loadedFromStruct.name;
+                path = this.loadedFromStruct.path;
+                doAddToPath = this.loadedFromStruct.doAddToPath;
+            end
+
             this.name = name;
             this.toolPath = strrep(path,'/',filesep);
 
@@ -55,6 +65,31 @@ classdef toolboxClass < statusClass
                          'doAddToPath',this.autoLoad,...
                          'status',this.status);
             val.toolInPath = this.toolInPath;
+            val.workspace = this.workspace;
+        end
+
+        function updateAfterLoadedFromStruct(this)
+            clearLoadStruct = true;
+            if isstruct(this.loadedFromStruct) % load from struct
+                for prop = reshape(setdiff(fieldnames(this.loadedFromStruct),{'className','name','path','doAddToPath','status'}),1,[])
+                    mc = metaclass(this);
+                    mp = mc.PropertyList{cellfun(@(p) strcmp(p.Name,prop{1}), mc.PropertyList)};
+                    if strcmp(mp.SetAccess,'public') || strcmp(mp.DefiningClass.Name,'toolboxClass')
+                        this.(prop{1}) = this.loadedFromStruct.(prop{1});
+                    else
+                        clearLoadStruct = false;
+                        if ~strcmp(mc.MethodList{cellfun(@(p) strcmp(p.Name,'updateAfterLoadedFromStruct'), mc.MethodList)}.DefiningClass.Name,mc.Name)
+                            warning(['Unique property ''%s'' of class ''%s'' is not public and cannot be updated and\n' ...
+                                     '\tthe class has no unique method ''updateAfterLoadedFromStruct'''],...
+                            prop{1},mc.Name);
+                        end
+                    end
+                end
+                if strcmp(this.loadedFromStruct.status,'loaded') && (this.pStatus < this.STATUS('loaded'))
+                    this.reload(true);
+                end
+                if clearLoadStruct, this.loadedFromStruct = false; end
+            end
         end
 
         function load(this,keepWorkspace)
@@ -70,7 +105,7 @@ classdef toolboxClass < statusClass
                 if exist(modDir,'dir')
                     addpath(genpath(modDir));
                     modDir = strsplit(genpath(modDir),pathsep);
-                    this.toolInPath = [reshape(modDir(1:end-1),[],1); reshape(this.toolInPath,[],1)];
+                    this.toolInPath = [reshape(modDir(~cellfun(@isempty, modDir)),[],1); reshape(this.toolInPath,[],1)];
                 end
                 this.pStatus = this.STATUS('loaded');
             end

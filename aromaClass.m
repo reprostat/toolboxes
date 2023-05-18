@@ -15,7 +15,7 @@ classdef aromaClass < toolboxClass
         hGUI = []% GUI handles
     end
 
-    properties (SetAccess = private)
+    properties (SetAccess = protected)
         condaEnvironment
     end
 
@@ -24,7 +24,7 @@ classdef aromaClass < toolboxClass
             defaultAddToPath = false;
 
             argParse = inputParser;
-            argParse.addRequired('path',@ischar);
+            argParse.addRequired('path',@(x) ischar(x) || isstruct(x));
             argParse.addParameter('name','',@ischar);
             argParse.addParameter('doAddToPath',defaultAddToPath,@(x) islogical(x) || isnumeric(x));
             argParse.addParameter('condaEnvironment','',@ischar);
@@ -33,11 +33,25 @@ classdef aromaClass < toolboxClass
             this = this@toolboxClass(argParse.Results.name,argParse.Results.path,argParse.Results.doAddToPath,{});
 
             this.condaEnvironment = argParse.Results.condaEnvironment;
+
+            this.updateAfterLoadedFromStruct();
+        end
+
+        function val = struct(this)
+            val = struct@toolboxClass(this);
+            val.condaEnvironment = this.condaEnvironment;
+        end
+
+        function updateAfterLoadedFromStruct(this)
+            updateAfterLoadedFromStruct@toolboxClass(this);
+            if isstruct(this.loadedFromStruct) % load from struct
+                this.condaEnvironment = this.loadedFromStruct.condaEnvironment;
+                this.loadedFromStruct = false;
+            end
         end
 
         function load(this)
             load@toolboxClass(this)
-
         end
     end
 end
