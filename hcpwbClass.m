@@ -28,7 +28,7 @@ classdef hcpwbClass < toolboxClass
         function load(obj)
             % specify binary folder
             if isunix
-                assert(contains(getenv('ARCH'),'64'),'64-bit OS required');
+                assert(lookFor(getenv('ARCH'),'64'),'64-bit OS required');
                 if exist('/etc/os-release','file')
                     lines = regexp(fileread('/etc/os-release'), '\n', 'split');
                     lines(cellfun(@isempty,lines)) = [];

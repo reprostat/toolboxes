@@ -7,7 +7,7 @@ function varargout = read_image_matlab(varargin)
 hdr = varargin{1};
 
 if nargin > 1 % specific variable
-    selVar = contains({hdr.fname},[',' varargin{2} ',']);
+    selVar = lookFor({hdr.fname},[',' varargin{2} ',']);
     if ~any(selVar)
         error('Some variable to be selected does not exist in the MAT file. Please check.')
     end
