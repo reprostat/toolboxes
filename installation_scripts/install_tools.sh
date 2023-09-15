@@ -6,10 +6,8 @@
 #
 # Input aguments
 #   - parameterset:             XML parameterset containing information of required tools
-#   - installation_directory:   This is where FaceMasking will be installed. When configuring rap.directoryconventions.facemaskingdir MUST point to '<installation_directory>/mask_face/nrg-improc'
 
 PARAMXML=$1
-INSTDIR=$2
 
 function install_tool() {
     name=$1
@@ -19,9 +17,9 @@ function install_tool() {
     if [[ $url == git+* ]]; then
         IFS='+' read -ra giturl <<< "$url"        
         if [[ -z ${giturl[2]} ]]; then
-            git clone ${giturl[1]}
+            git clone ${giturl[1]} $folder
         else
-            git clone -b ${giturl[2]} ${giturl[1]}
+            git clone -b ${giturl[2]} ${giturl[1]} $folder
         fi
         if [[ -f ${folder}/requirements.txt ]]; then
             python2.7 -m pip install -r ${folder}/requirements.txt
@@ -36,16 +34,13 @@ function install_tool() {
     fi
 }
 
-CWD=$PWD
-cd ${INSTDIR}
-
 # Toolboxes
 tbxCount=$(xmllint --xpath 'count(//rap/local/directoryconventions/toolbox)' $PARAMXML)
 for indTbx in `seq $tbxCount`; do
     tbxName=$(xmllint --xpath '//rap/local/directoryconventions/toolbox['$indTbx']/name/text()' $PARAMXML)
     varURL=URL_${tbxName}
     tbxDir=$(xmllint --xpath '//rap/local/directoryconventions/toolbox['$indTbx']/dir/text()' $PARAMXML)
-    install_tool $tbxName ${!varURL} $tbxDir
+    install_tool $tbxName ${!varURL} $(eval "echo $tbxDir")
 done
 
 # Dedicated tools
@@ -53,5 +48,3 @@ done
 # if [[ $(xmllint --xpath 'count(//rap/local/directoryconventions/facemaskingdir)' $PARAMXML) > 0 ]]; then
 #    install_tool FaceMasking $URL_facemasking $(xmllint --xpath '//rap/local/directoryconventions/facemaskingdir/text()' $PARAMXML)
 # fi
-
-cd $CWD
