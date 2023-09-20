@@ -1,14 +1,11 @@
-% Also, AROMA requires python2.7 and pip.
+% Also, ICA-AROMA requires Python 3.6
+% The integration requires a named conda virtual environment.
 %
-% The easiest way to install is prolly:
-%
-%   % cd /users/abcd1234/tools
-%   % git clone https://github.com/maartenmennes/ICA-AROMA.git
-%   % python2.7 -m pip install -r ICA-AROMA/requirements.txt
-%
-%   (assuming that the repo link is still valid)
-%
-% TODO: add python virtual environment for shared systems without admin access
+%   cd /users/abcd1234/tools
+%   git clone https://github.com/tiborauer/ICA-AROMA.git
+%   conda create -n aroma python=3.6
+%   conda activate aroma
+%   pip install -r ICA-AROMA/requirements.txt
 %
 classdef aromaClass < toolboxClass
     properties (Access = protected)
