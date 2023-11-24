@@ -7,7 +7,8 @@ classdef bnvClass < toolboxClass
         displaySettings = struct(...
             'view','LMD',...
             'edgeSize', 0.5,...
-            'LUT','hot'...
+            'LUT','hot',...
+            'showLabels', 1...
             )
     end
     
@@ -55,6 +56,10 @@ classdef bnvClass < toolboxClass
             cm = feval(obj.displaySettings.LUT,128); % avoid edges with too light or dark colours
             out.edg.CM = cm(33:96,:);
             out.edg.directed = 1;
+            if obj.displaySettings.showLabels
+                out.lbl = 1;
+                out.lbl_front = 1;
+            end
         end
     end
 end

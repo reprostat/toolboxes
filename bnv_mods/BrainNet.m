@@ -53,9 +53,13 @@ if nargin
         global EC       
         if nargin > 1 && isstruct(varargin{2})
             for f = fieldnames(varargin{2})'
-                for ff = fieldnames(varargin{2}.(f{1}))'
-                    EC.(f{1}).(ff{1}) = varargin{2}.(f{1}).(ff{1});
-                end               
+                if isstruct(varargin{2}.(f{1}))
+                    for ff = fieldnames(varargin{2}.(f{1}))'
+                        EC.(f{1}).(ff{1}) = varargin{2}.(f{1}).(ff{1});
+                    end
+                else
+                    EC.(f{1}) = varargin{2}.(f{1});
+                end
             end
         end
         BrainNet_LoadFiles(varargin{1});
