@@ -73,12 +73,21 @@ classdef toolboxClass < statusClass
             if isstruct(this.loadedFromStruct) % load from struct
                 for prop = reshape(setdiff(fieldnames(this.loadedFromStruct),{'className','name','path','doAddToPath','status'}),1,[])
                     mc = metaclass(this);
-                    mp = mc.PropertyList{cellfun(@(p) strcmp(p.Name,prop{1}), mc.PropertyList)};
+                    if iscell(mc.PropertyList)
+                        mp = mc.PropertyList{cellfun(@(p) strcmp(p.Name,prop{1}), mc.PropertyList)};
+                    else
+                        mp = mc.PropertyList(arrayfun(@(p) strcmp(p.Name,prop{1}), mc.PropertyList));
+                    end
                     if strcmp(mp.SetAccess,'public') || strcmp(mp.DefiningClass.Name,'toolboxClass')
                         this.(prop{1}) = this.loadedFromStruct.(prop{1});
                     else
                         clearLoadStruct = false;
-                        if ~strcmp(mc.MethodList{cellfun(@(p) strcmp(p.Name,'updateAfterLoadedFromStruct'), mc.MethodList)}.DefiningClass.Name,mc.Name)
+                        if iscell(mc.MethodList)
+                            mm = mc.MethodList{cellfun(@(p) strcmp(p.Name,'updateAfterLoadedFromStruct'), mc.MethodList)};
+                        else
+                            mm = mc.MethodList(arrayfun(@(p) strcmp(p.Name,'updateAfterLoadedFromStruct'), mc.MethodList));
+                        end
+                        if ~strcmp(mm.DefiningClass.Name,mc.Name)
                             warning(['Unique property ''%s'' of class ''%s'' is not public and cannot be updated and\n' ...
                                      '\tthe class has no unique method ''updateAfterLoadedFromStruct'''],...
                             prop{1},mc.Name);
