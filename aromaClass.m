@@ -24,7 +24,7 @@ classdef aromaClass < toolboxClass
             argParse.addRequired('path',@(x) ischar(x) || isstruct(x));
             argParse.addParameter('name','',@ischar);
             argParse.addParameter('doAddToPath',defaultAddToPath,@(x) islogical(x) || isnumeric(x));
-            argParse.addParameter('condaEnvironment','',@ischar);
+            argParse.addParameter('condaEnvironment','aroma',@ischar);
             argParse.parse(path,varargin{:});
 
             this = this@toolboxClass(argParse.Results.name,argParse.Results.path,argParse.Results.doAddToPath,{});
