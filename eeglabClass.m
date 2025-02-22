@@ -55,8 +55,9 @@ classdef eeglabClass < toolboxClass
             if nargin < 2, keepWorkspace = false; end
             addpath(obj.toolPath);
             is_new_plugin = false;
-            eeglab;
-            if ~obj.showGUI, set(gcf,'visible','off'); end
+            if ~obj.showGUI, eeglab('nogui');
+            else, eeglab;
+            end
             obj.plugins = evalin('base','PLUGINLIST');
             
             plPost = {};
@@ -64,7 +65,7 @@ classdef eeglabClass < toolboxClass
             for p = reshape(pllist,1,[])
                 if any(strcmp({obj.requiredPlugins.name}, p.name)) && ~p.installed
                     plInf = obj.requiredPlugins(strcmp({obj.requiredPlugins.name},p.name));
-                    if ~isempty(plInf.version)
+                    if isfield(plInf,'version') && ~isempty(plInf.version)
                         if isnumeric(plInf.version), plInf.version = num2str(plInf.version); end
                         p.version = plInf.version;
                         p.zip = spm_file(p.zip,'basename',[p.name p.version]);
