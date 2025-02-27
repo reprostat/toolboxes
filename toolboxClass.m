@@ -113,7 +113,12 @@ classdef toolboxClass < statusClass
                 modDir = fullfile(fileparts(mfilename('fullpath')),[tbname '_mods']);
                 if exist(modDir,'dir')
                     if isOctave(), addpath(genpath(modDir));
-                    else, addpath(genpath(modDir,'octave'));
+                    else
+                        p_mod = strsplit(genpath(modDir),pathsep);
+                        for p_oct = p_mod(endsWith(p_mod, 'octave'))
+                            p_mod(startsWith(p_mod, p_oct{1})) = [];
+                        end
+                        addpath(strjoin(p_mod,pathsep));
                     end
                     modDir = strsplit(genpath(modDir),pathsep);
                     this.toolInPath = [reshape(modDir(~cellfun(@isempty, modDir)),[],1); reshape(this.toolInPath,[],1)];
