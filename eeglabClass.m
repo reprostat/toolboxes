@@ -17,7 +17,7 @@ classdef eeglabClass < toolboxClass
 
     methods
         function this = eeglabClass(path,varargin)
-            defaultAddToPath = true;
+            defaultAddToPath = false;
             defaultRequiredPlugins = {};
             defaultKeepGUI = false;
 

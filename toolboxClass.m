@@ -112,7 +112,9 @@ classdef toolboxClass < statusClass
                 if isempty(tbname), tbname = strrep(class(this),'Class',''); end
                 modDir = fullfile(fileparts(mfilename('fullpath')),[tbname '_mods']);
                 if exist(modDir,'dir')
-                    addpath(genpath(modDir));
+                    if isOctave(), addpath(genpath(modDir));
+                    else, addpath(genpath(modDir,'octave'));
+                    end
                     modDir = strsplit(genpath(modDir),pathsep);
                     this.toolInPath = [reshape(modDir(~cellfun(@isempty, modDir)),[],1); reshape(this.toolInPath,[],1)];
                 end
