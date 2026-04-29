@@ -22,7 +22,7 @@ function install_tool() {
             git clone -b ${giturl[2]} ${giturl[1]} $folder
         fi
         if [[ -f ${folder}/requirements.txt ]]; then
-            python2.7 -m pip install -r ${folder}/requirements.txt
+            python -m pip install -r ${folder}/requirements.txt
         fi
     fi
 
